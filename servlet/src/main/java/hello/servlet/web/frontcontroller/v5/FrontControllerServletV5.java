@@ -59,7 +59,8 @@ public class FrontControllerServletV5 extends HttpServlet {
 
         MyHandlerAdapter adapter = getHandlerAdapter(handler); //핸들러를 처리할 수 있는 어댑터를 조회
 
-        ModelView modelView = adapter.handle(request, response, handler); //실제 어댑터 호출
+        //어댑터가 중간 역할을 해주기 때문에 프론트 컨트롤러가 다양한 방식의 컨트롤러를 처리할 수 있게된다
+        ModelView modelView = adapter.handle(request, response, handler);
         String viewName = modelView.getViewName();
         MyView view = viewResolver(viewName);
 
