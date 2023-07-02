@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import springmvc.itemservice.domain.item.Item;
 import springmvc.itemservice.domain.item.ItemRepository;
 
@@ -41,12 +42,18 @@ public class BasicItemController {
      * - 모델에 지정한 객체를 자동으로 넣어준다
      * - ModelAttribute 이름을 생력 시 클래스명으로 모델에 자동 추가
      * - 어노테이션 자체를 생략할 수 있다
+     *
+     * redirect:/...
+     * - 스프링은 redirect:/ 로 편리하게 리다이렉트를 지원한다
+     * - URL 인코딩, pathVariable, 쿼리 파라미터까지 지원해준다
      */
     @PostMapping("/add")
-    public String addItem(@ModelAttribute Item item, Model model) {
-        itemRepository.save(item);
+    public String addItem(@ModelAttribute Item item, RedirectAttributes redirectAttributes) {
+        Item savedItem = itemRepository.save(item);
         //model.addAttribute("item", item); //자동 추가, 생략 가능
-        return "redirect:/basic/items/" + item.getId();
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/basic/items/{itemId}"; //새로고침 문제 해결을 위한 리다이렉트 > 뷰 호출 X
     }
 
     @GetMapping("/{itemId}/edit")
@@ -59,7 +66,7 @@ public class BasicItemController {
     @PostMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
         itemRepository.update(itemId, item);
-        return "redirect:/basic/items/{itemId}"; //스프링은 redirect:/ 로 편리하게 리다이렉트를 지원한다. @PathVariable 의 값도 사용 가능
+        return "redirect:/basic/items/{itemId}";
     }
 
     /**
